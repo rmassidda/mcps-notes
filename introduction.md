@@ -1,6 +1,7 @@
 ---
 documentclass: article
 title: Mobile and Cyber-Physical Systems
+toc: True
 ---
 
 # Introduction
