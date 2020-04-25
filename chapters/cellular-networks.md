@@ -1,12 +1,13 @@
 # Managing mobility in cellular networks
 A cellular network is composed by a set of a cells, each one one covering a distinct geographical region and connected by a Mobile Switching Center (MSC) that also manages the call setup and handles mobility.
+A cell is composed by a base station (BS), that has analogous functions to an access point of 802.11, and its mobile users.
 
-A cell is composed by a base station (BS), that has analogous functions to the access points of 802.11, and its mobile users.
 The radio spectrum used for the mobile-to-BS communication can be handled in two different ways:
-- Combined FDMA/TDMA, where the spectrum is divided in frequency channels, and each channel into time slots.
-- CDMA, Code Division Multiple Access
 
-What we have for now called base station could actually be a Base Station System (BSS), composed by multiple antennas grouped by a Base Station Controller.
+- Combined FDMA/TDMA, where the spectrum is divided in frequency channels, and each channel into time slots.
+- CDMA, Code Division Multiple Access.
+
+A Base Station System (BSS) is composed by multiple base stations grouped by a Base Station Controller.
 It should be noticed that up to 3G the data communication was parallel in respect to the voice one, that still used old circuit switching techniques.
 
 ## Mobility
