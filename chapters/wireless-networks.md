@@ -65,58 +65,58 @@ The MACAW protocol offers various improvements over MACA:
 - Exponential backoff is run for each separate pair source/destination and not for the single station.
 - A mechanisms to exchange information among stations and recognize temporary congestion problems is introduced.
 
-## CSMA/CA
-The CSMA/CA protocol used in IEEE 802.11 is based on the MACAW protocol.
-
-We can distinguish three types of frames:
-
-- Management, used for station association/dissociation with the AP, synchronization, authentication.
-- Control, for handshaking and acknowledgement
-- Data, data transmission, possibly combined with polling and ACK in PCF
+## IEEE 802.11
+IEEE 802.11 is part of the IEEE 802 set of LAN protocols, and specifies the set of media access control and physical layer protocols for implementing wireless local area networks in various frequencies, including but not limited to 2.4 GHz, 5 GHz, and 60 GHz frequency bands.
+Introduced in the late 90s, different versions have been released during the years, improving the physical layers but leaving the unchanged the use of CSMA/CA in the MAC sublayer.
  
-In the 802.11 architecture a group of stations operates under a given coordination function.
-If a base station, know as access point (AP), is present any station communicates with another by channeling all the traffic through a centralized AP that can provide connectivity with other APs and other groups of stations via fixed infrastructure.
+In the 802.11 architecture a group of stations operates under a given coordination function, this function can be decentralized (Distributed Coordination Function, DCF) or controlled by a unique station (Point Coordination Function, PCF).
+The presence of a base station, know as access point (AP), requires the other stations to communicate with each other by channeling all the traffic through the centralized AP.
+The access point can provide connectivity with other APs and so other groups of stations via a fixed infrastructure.
 In the absence of an AP, 802.11 supports ad-hoc networks which are as always under the control of a single coordination function, but without the aid of an infrastructure network.
 
-There are two modes of operations:
-
-- Distributed Coordination Function, that is completely decentralized
-- Point Coordination Function, executed by an AP if present but still based on the DCF.
-
-In fact the DCF must be implemented by all stations, and DCF and PCF can be active at the same time in the same cell.
+The DCF must be implemented by all stations, and DCF and PCF can be active at the same time in the same cell.
 
 ### Distributed Coordination Function
+In the DCF the carrier sensing is performed both at the physical and the virtual level, and the channel is marked busy if either one of this two indicators is considered to be active:
 
-In the DCF the carrier sensing is performed at two levels, and the channel is marked busy if either one of this two indicators is considered to be active:
-
-- Physical, by detecting the presence of other users by analyzing all the detected packets.
-- Virtual, performed sending duration information in the header of an RTS, CTS or data frame and keeping the channel virtually busy up to the end of a data frame transmission.
+Physical carrier sensing detects the presence of other active nodes by analyzing all the detected packets and detecting any activity in the channel due to other sources.
+Virtual carrier sensing is performed by sending duration information in the header of an RTS, CTS or data frame and keeping the channel virtually busy up to the end of the data frame transmission.
 
 The access to the medium is controlled through the use of growing inter-frame spaces (IFS): Short IFS, Point IFS and Distributed IFS.
 
 This is the essence of the DCF based communication:
 
-- The source senses the channel until it becomes idle, then waits DIFS.
-- The source sends the data, all the stations detecting the frame sets a Network Allocation Vector (NAV) to mark the channel virtually busy for the time required for the data to be transmitted and the ACK to be received.
+- The source senses the channel until it becomes idle, then waits DIFS and checks if the channel is still idle.
+- The source sends the data, all the stations detecting the frame set a Network Allocation Vector (NAV) to mark the channel virtually busy for the time required for the data to be transmitted and the ACK to be received.
 - The destination waits SIFS after receiving the data and then it sends the ACK.
 
-If a collision happens because multiple stations send a data frame in the same instant the whole frame is sent before using binary exponential backoff to resend.
+A collision could happen because of multiple stations sending a data frame in the same instant, in that case the whole frame is sent before using binary exponential backoff to resend.
 The contention time depends on the physical layer, anyway the backoff can be interrupted if the channel is sensed as busy and then the timer reprises after DIFS when it becomes idle again.
 
-To avoid this situation, the RTS/CTS mechanism already seen in MACA can be implemented for all the possible frames or only for the enough bigger ones, in this case the other stations sets a shrinking NAV for the RTS, CTS and the data frame.
+To avoid this situation, the RTS/CTS mechanism already seen in MACA can be implemented for all the possible frames or only for the enough big ones, in this case the other stations set multiple shrinking NAVs for the RTS, CTS and the data frame.
 
 Also fragmentation can be useful to improve reliability, the frames are sent in sequence but each one waits for the acknowledgement of the previous.
-In the case a fragments isn't correctly delivered the transmission reprise from that one and not from the start, even in this case the NAV is specialized for the different fragments length other than for the RTS/CTS.
+In the case a fragments isn't correctly delivered the transmission reprises from that last one and not from the start, even in this case the NAV is specialized for the different fragments length other than for the RTS/CTS.
 It should be noticed that if present, the RTS/CTS mechanism is used only for the first fragment.
 
 ### Point Coordination Function
-In this operative mode the communication is under the control of the point coordinator (PC) that performs polling and enables stations to transmit without contending for the channel, as previously stated this method must coexist with DCF.
+In this operative mode the communication is under the control of the point coordinator (PC) that performs polling and enables stations to transmit without contending for the channel.
+As previously stated this method must coexist with DCF.
 
-According to a repetition interval, `CFP_RATE`, the PC periodically waits PIFS and sends a beacon frame that signifies the start of a portion of time allocated for contention-free traffic.
-The contention-free portion has a maximum `CFP_MAX_DURATION` shared between all the stations, but the actual length is determined inside the beacon frame by the PC.
-After the beacon frame the PC can wait SIFS and send data and/or a poll frame to a station, this can be done multiple times inside the contention-free window.
-After having received a beacon frame each station sets a NAV for the duration of the contention-free period, in that period they can only respond to data received using SIFS+ACK, or send data to any other station if polled by the PC.
+According to a repetition interval, `CFP_RATE`, the PC periodically waits PIFS and sends a beacon frame to notify the start of a portion of time allocated for contention-free traffic.
+The contention-free portion has a maximum time duration `CFP_MAX_DURATION` shared between all the stations, but the actual length is determined inside the beacon frame by the PC.
 The contention-free period is always closed by a Contention Free End (CFE) frame.
+
+Inside the contention-free period the communication are always initialized by the PC station, that can send data and/or a poll frame to a station, this can be done multiple times inside the same contention-free window.
+After having received a beacon frame each station sets a NAV for the duration of the contention-free period, in that period they can only respond to data received using SIFS+ACK, or send data to any other station if polled by the PC.
 
 With this model PC can also send to a non-PCF aware station that only has DCF, since this station will respond with an ACK, also messages can be fragmented as in DCF.
 
+### Frame format specification
+A frame of the 802.11 protocol most contain other important informations other than the obvious source and destination addresses and the data buffer.
+
+The version of the protocol is needed, since given the interoperability at the MAC layer different protocols can coexist in the same cell.
+There are three types of frames: management (association/dissociation, synchronization, authentication), control (handshaking, acknowledgement) and data (data transmission, possibly combined with polling and ACK in PCF).
+Also the subtype of the frame may be specified to identify special frames like RTS, CTS and ACK.
+
+Further informations regard the fragmentation, the encryption, the estimated time to complete the transmission and the CRC for error detection.
