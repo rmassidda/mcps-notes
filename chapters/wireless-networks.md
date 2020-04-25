@@ -48,17 +48,22 @@ Suppose now that `A` and `C` are both in the range of `B` and that `B` is sendin
 In the exposed terminal scenario using CSMA/CD `C` must refrain to send any packet, while there could be a station `D` out of the range of `B` to which `C` could communicate without any problem.
 
 ## MACA protocol
-To overcome the technical limitations of CSMA/CD in wireless network we introduce the MACA protocol where the receiver is stimulated (Ready-to-send, RTS) into transmitting a short frame first (Clear-to-send, CTS).
-The stations hearing the CTS refrain from transmitting during the transmission of the subsequent data frame, the length is known because is contained both in RTS and CTS.
+The Multiple Accesses with Collision Avoidance (MACA) protocol offers a simple solution to overcome the technical limitations of CSMA/CD in wireless networks.
+The basic idea concerns stimulating the receiver using a short frame (Ready-to-send, RTS) into transmitting a short frame in turn (Clear-to-send, CTS).
+Once the CTS has been received from the sender it can start transmitting the data frame.
 
-If a station receives multiple RTS detects the collision and doesn't respond with any CTS, so the originating stations after a timer waits using binary exponential backoff before trying to send again the data frame.
+The other stations hearing the CTS should refrain from requesting the media during the transmission of the data frame, of which the length is known since it is contained both in the RTS and the CTS.
+This is sufficient to solve both the hidden and the exposed terminal issues.
 
-In the MACAW version there are further improvements:
+If a station receives multiple RTS detects the collision and doesn't respond with a CTS.
+The sending stations noticing that no CTS has been received assume a collision at the receiver and so they start binary exponential backoff before retrying.
+
+The MACAW protocol offers various improvements over MACA:
 
 - An ACK frame is introduced to acknowledge a successful data frame.
-- Carrier sensing is required, to keep a station from transmitting RTS when a nearby station is also transmitting an RTS to the same destination.
+- Carrier sensing is required to keep a station from transmitting RTS when a nearby station is also transmitting an RTS to the same destination.
 - Exponential backoff is run for each separate pair source/destination and not for the single station.
-- Mechanisms to exchange information among stations and recognize temporary congestion problems
+- A mechanisms to exchange information among stations and recognize temporary congestion problems is introduced.
 
 ## CSMA/CA
 The CSMA/CA protocol used in IEEE 802.11 is based on the MACAW protocol.
