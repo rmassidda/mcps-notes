@@ -1,45 +1,51 @@
 # Wireless Networks
 A wireless network is a network of mobile hosts connected by wireless links.
+Such networks can operate using an infrastructure with base stations or without any centralized coordinator as an ad-hoc network.
 
-The hosts, or nodes, are autonomous and independent, that means that they are mobile battery powered devices that communicate mainly via radio frequencies, like laptops or smartphones.
-Anyway it should be considered that wireless doesn't imply mobility, while the opposite holds true.
+A base station is a device typically connected to a wired network and it's responsible as a relay between the wireless hosts in its area and an outer network.
+Other than the different architectures, wireless networks could be classified by the number of hops needed to deliver a package.
 
-A base station is typically connected to a wired network and has the function of a relay, that is responsible for sending packets between wired network and wireless hosts in it area.
-The presence of a base station defines the infrastructure of the network, while in its absence there is no centralized coordinator and so the scenario it's called ad-hoc networking.
+Multiple issues are specifics of the wireless medium, for instance:
 
-In respect to wired links there are multiple issues that can be measured in the signal-to-noise ratio (SNR) and in the bit-error-rate (BER):
-
-- Decreased signal strength, the radio signal attenuates quicker as it propagates.
-- Interference from other sources, the standard wireless frequencies are share by multiple wireless devices, and possibly by other tools (engines, microwave ovens).
+- Decreased signal strength, the radio signal attenuates quicker as it propagates respect to the wired attenuation.
+- Interference from other sources, the standard wireless frequencies are shared by multiple wireless devices, and possibly by other tools (engines, microwave ovens, etc.)
 - Multipath propagation, the radio signal reflects off objects or ground, arriving at destination at slightly different times.
 
-This situation produces multiple challenges for wireless communication:
+Two possible metrics to validate the effect of these issues are the signal-to-noise ratio (SNR) and in the bit-error-rate (BER).
+These problematic characteristic of the medium also produce multiple challenges for wireless communication:
 
-- Limited knowledge, a terminal cannot hear from all the others in the network, producing the hidden/exposed terminal problems.
-- Limited terminals, the battery life, the memory, the computational power and the transmission range are limited.
+- Limited knowledge, a terminal cannot hear from all the others in the network, producing the hidden/exposed terminal scenarios.
+- Limited terminals, the battery life, the memory, the computational power and the transmission range of a device are limited.
 - Mobility/Failure of terminals, that can move in the range of different base-stations or move away from each other.
-- Privacy, favored by the easy eavesdropping of ongoing communication.
+- Privacy, undermined by the easiness eavesdropping of ongoing communication.
 
 ## CSMA/CD
-In a wired network we can reasonably assume that:
+In a wired network a single channel is available for all the stations.
+If frames are sent simultaneously the resulting signal is garbled, generating a collision detectable by all the hosts.
 
-- A single channel is available for all communications, and all stations can transmit and receive on it
-- If frames are sent simultaneously on the channel the resulting signal is garbled by the collision, and all stations can detect the collisions.
+Given these context many different protocols were developed, culminating in the widely adopted Carrier-sense multiple access with collision detection (CSMA/CD) protocol:
 
-Given these assumptions many different protocols were developed, culminating in the widely adopted Carrier-Sense multiple access Collision Detection (CSMA/CD) protocol:
-
-- When a station has a frame to send it listens to the channel to see if it's busy waiting until it becomes idle.
+- When a station has a frame to send, it listens to the channel to check if it's busy, waiting until it becomes idle.
 - If a collision occurs the station waits a random amount of time and repeats the procedure.
-- (CD) If a station is communicating and detects a collision it aborts immediately.
+- If a station is communicating and detects a collision it aborts immediately. (CD)
 
-The random amount of time is selected by using the binary exponential backoff technique.
+The random amount of time is selected by the binary exponential backoff technique.
 This method uses contention slots equal to the double of the time necessary for the farthest stations to communicate.
-After the $i$ collision each station waits a number of contention slots comprised in the interval $0, 2^i -1$, up to a maximum of $i=16$ where the failure is then reported to upper levels.
+After the $i$ collision each station waits a number of contention slots comprised in the interval $[0, 2^i -1]$, up to a maximum of $i=16$ after which the failure is reported to upper levels.
 
-CSMA/CD can't be used in wireless networks, because it could generate two different type of errors, both characterized by the fact that what matters is that the interference is detected by the receiver and not by the sender.
+In CSMA/CD the interferences are detected by the transmitter, while in the wireless networks what matters are interferences at the receiver.
+Using CSMA/CD in wireless networks leads to two known problematic scenarios: the hidden terminal and the exposed terminal.
 
-In the hidden terminal problem two stations out of range communicate to a station in the middle, generating a collision undetected by the former.
-In the exposed terminal a station receives a signal and so refrains to communicate, while the receiver could not get any collision.
+![Hidden terminal](assets/hidden_terminal.png)
+
+In the hidden terminal problem there are three stations, `A`, `B` and `C`.
+Suppose that `A` and `C` want simultaneously to send a packet to `B`, and that `A` is not in the range of `C` and vice versa.
+Both the senders would sense the medium as free, while `B` will only receive noise due to the collision in its range.
+
+![Exposed terminal](assets/exposed_terminal.png)
+
+Suppose now that `A` and `C` are both in the range of `B` and that `B` is sending a packet to `A`.
+In the exposed terminal scenario using CSMA/CD `C` must refrain to send any packet, while there could be a station `D` out of the range of `B` to which `C` could communicate without any problem.
 
 ## MACA protocol
 To overcome the technical limitations of CSMA/CD in wireless network we introduce the MACA protocol where the receiver is stimulated (Ready-to-send, RTS) into transmitting a short frame first (Clear-to-send, CTS).
