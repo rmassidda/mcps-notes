@@ -88,40 +88,70 @@ This can be proved by using Hölder inequality.
 
 ## MAC Protocols
 In a WSN the use of MAC protocols is not confined to media arbitration, but it is also useful for energy efficiency.
-The objectives are to reduce the radio duty cycle and to maintain network connectivity, so the tradeoff is between the energy and the latency or the bandwidth.
-
-The synchronization of the nodes is a desirable condition since if the nodes are synchronized they can turn on the radios simultaneously.
+The objectives are to reduce the radio duty cycle and to maintain network connectivity, so the tradeoff is between the energy consumption of each sensor and the performances of the whole network.
 
 ### S-MAC
 This protocol exploits local node synchronization, alternating listen and sleep periods when the sensor is not able to detect any incoming message.
+The synchronization of the nodes is a desirable condition since if the nodes are synchronized they can turn on the radios simultaneously.
 
 Adjacent sensors synchronize their listen periods by means of periodical local broadcasts of `SYNC` packets that contain the schedule of the sensor.
 If a sensor detects adjacent sensors with a predefined listen period it uses the same period, otherwise it chooses its own period advertising it to the neighbors.
+Even after the initialization of the sensor it's possible to revert to something else's schedule, if its own schedule is not shared with anybody else.
 
 Since a sensor can receive a packet only in its listen period, the sender may need to turn on its radio also outside its listen period, so it should know all the listen periods of its neighbors.
-Before sending a packet the media is sensed, if busy it tries again in the next period, also the collision avoidance mechanism is based on RTS/CTS as in IEEE 802.11.
+Before sending a packet the media is sensed, if busy it tries again in the slot, the collision avoidance mechanism used is based on RTS/CTS as in IEEE 802.11.
 
-While travelling across a multihop path a packet may have to wait in the worst case for the listen period of each intermediate node, this is mitigated by the fact that hopefully a certain number of sensors will converge towards the same schedule.
-It should be noticed that in any case depending on the topology it may be impossible for a sensor to have a listen period compatible with all its neighbors.
+While travelling across a multihop path a packet may have to wait in the worst case for the listen period of each intermediate node, accumulating latency at each hop.
+This situation should be mitigated by the fact that hopefully a certain number of sensors will converge towards the same schedule, even though there is not any guarantee of convergence.
+In fact depending on the topology it may be impossible for a sensor to have a listen period compatible with all its neighbors.
 
 ### B-MAC
 In B-MAC a node can send whenever it wants using packets that contain a very long preamble in the header.
 The receiver activates its radio periodically to check if there is a preamble on the air, this activity is called preamble sampling and it is based on a low-power-listening mode.
-Obviously the preamble should be longer than the sleep period, this costs more in transmission but save energy in reception since the preamble sampling can be very short and cheap.
+Obviously the preamble should be longer than the sleep period, because of this B-MAC costs more in transmission but save energy in reception since the preamble sampling can be very short and cheap.
 
-We can model the energy consumption in Joule spent in $t$ seconds for both the sender and the receiver and consequently the lifetime.
+The energy consumption can be modeled as follows.
+Assume that $f_c$ is the frequency of checking the medium for each sensor and that the medium is sensed for $t_c$ seconds, then the duty cycle in a second of time is:
 
-This simple and transparent protocol may turn to be expensive in the long run.
+$$
+dc^{\textrm{check}} = f_c \cdot t_c
+$$
+
+Given a packet length in seconds of $t_d$ and a preamble length in seconds of $t_p$, the duty cycle for a transmitter is:
+
+$$
+dc^{\textrm{tx}} = f_d \cdot (t_p + t_d)
+$$
+
+Assuming $\epsilon$ to be the fraction of the preamble that has been captured by the receiver, its duty cycle is:
+
+$$
+dc^{\textrm{rx}} = f_d \cdot (t_p \cdot \epsilon + t_d)
+$$
+
+Now assuming that power in Watt required to transmit to be $p_{tx}$ and to receive $p_{rx}$ it is possible to compute the energy spent in Joule using for $t$ seconds.
+
+$$
+E = \sum_{s \in \{\textrm{check},\textrm{tx},\textrm{rx},\textrm{none}\} } p_s \cdot dc^s
+$$
+$$
+E(t) = t \cdot E
+$$
+
+This simple and transparent protocol may turn to be expensive in the long run since the preamble sampling is not negligible.
 
 ### X-MAC
-This protocol is an evolution of B-MAC aimed to reduce the impact of long preambles by inserting the ID of the receiver so that it is able to check if it's the actual receiver and also to interrupt the preamble to request the packet.
-This second feature is realized since the transmitter fragments the preamble and waits for an acknowledgment from the receiver for a short timer after each fragment.
+This protocol is an evolution of B-MAC aimed to reduce the impact of long preambles.
+The transmitter fragments the preamble and inserts the ID of the receiver in each of this fragments.
+The correct receiver of the packet is so able to interrupt the preamble to request the packet.
+
+The protocol BoX-MAC is a further development of X-MAC that sends the actual packet instead of a preamble, so that the receiver only has to respond with an acknowledgement to stop the repetition of the message.
 
 ### Polling
 Polling is an asymmetrical MAC technique that is combined with synchronization.
 
 One master node issues periodic beacons, while several slaves can keep the radio off whenever they want.
-If the master receives a message for a slave it stores the message and advertises it in the beacon, when the slave turns on the radio it waits for the beacon and recognizing that there is a pending message it request it to the master.
+If the master receives a message for a slave it stores the message and advertises it in the beacon, when the slave turns on the radio it waits for the beacon and recognizing that there is a pending message it requests it to the master.
 
 ## Network Protocols
 Sensor networks are mostly data centric, so the identification of a node is less meaningful than its capabilities, nonetheless traditional routing protocols are not practical because of the large routing tables and the size of packet headers.
