@@ -1,26 +1,59 @@
 # Wireless sensor networks
-A Wireless Sensor Network is a very characteristic network where each of its nodes is a small autonomous sensor with low power and low cost system.
+A Wireless Sensor Network is a peculiar ad-hoc wireless network characterized by the fact that its nodes are small autonomous sensors with low power. 
+The sensors are equipped with little amounts of memory storage and computational power, other than the radio transceivers needed to perform communication.
 
-Of the many issues in the WSN design one of the most important is the energy consumption, since sensors are battery-powered and need efficient solutions.
-
-The wireless communication, that is use of a radio, is obviously costly and so the radio should be turned off as much as possible, also the processor should be turned off when not used.
-In any case turning on and off consumes power as well, so it's useful to find a balance between this two states.
+## Energy consumption
+Of the many issues in the WSN design one of the most important is the energy consumption, since the sensors are battery-powered and so they need efficient solutions.
+The wireless communication is obviously costly and so the radio should be turned off as much as possible, this should be applied to all the components in a sensor.
+In any case switching on and off the components consumes power as well, so a balance must be found.
 
 The activities of a sensor are mostly repetitive: sense, process, store, transmit and receive.
 Each sensor alternates a period of activity and a period of inactivity, this defines a duty cycle.
 
+Formally the duty cycle of a component $\mu$ is the fraction of the period in which the component is active.
+
+$$
+\sum_{s \in S_\mu} dc_\mu^s = 1
+$$
+
 The energy cost of any component $\mu$ can be computed as:
 
 $$
-E_{\mu} = c_{\mu}^{full} \cdot dc_{\mu} + c_{\mu}^{idle} \cdot (1-dc_{\mu})
+E_{\mu} = \sum_{s \in S_\mu} c_{\mu}^{s} \cdot dc_{\mu}^{s}
 $$
 
-The total energy cost is the sum over all the components $E = \sum_\mu E_\mu$.
-The battery capacity at cycle $n$ is defined as $B_n = B_{n-1} (1-\epsilon) - E$, where $L$ or $\epsilon$ is the loss of capacity per cycle. ???
-By solving the recurrence equation we are able to obtain the lifetime of the device for $n$ s.t. $B_n = B_0 (1-\epsilon)^{n-1} + \frac{E((1-\epsilon)^n -1)}{L} = 0$.
+The total energy cost for the sensor is obtained as: 
 
-So it seems that reducing the duty cycle is a good solution to reduce the energy consumption and improve the efficiency, it should be noticed that while turning off the processor is a local decision, turning off the radio requires a global decision, since when the node is down the sensor can't contribute to the network, that as we already have seen is a requirement of multiple cooperative routing algorithms.
-The decisions about the state off the radio are usually directly managed by the MAC protocols for the WSN.
+$$
+E = \sum_\mu E_\mu
+$$
+
+Given an initial capacity $B_0$ for the battery of the sensor it's possible to compute the ideal lifetime of a sensor as:
+
+$$
+n = \frac{B_0}{E}
+$$
+
+Actually the battery is an object that loses its capacity during the time, so also the battery leaks must be formalized:
+
+$$
+n = \frac{B_0 - L(n)}{E}
+$$
+
+Given that the overall battery leaks $L$ also depends on the lifetime the formulation of a problem leads to the following recurrence equation, where the term $\epsilon$ represents the leaks per cycle and $\gamma = 1-\epsilon$ is used to simplify the notation.
+
+$$
+B_n = B_{n-1} \cdot ( 1 - \epsilon ) - E \\
+$$
+$$
+B_n = B_0 \cdot \gamma^n - E \cdot \frac{\gamma^n-1}{\gamma-1}
+$$
+
+The lifetime $n$ is so the first value for which $B_n \leq 0$.
+
+Reducing the duty cycle is a good solution to reduce the energy consumption and improve the efficiency.
+Anyway it should be noticed that while turning off the processor is a local decision, turning off the radio requires a global decision, since when the node is down the sensor can't contribute to the network, that as we already have seen is a requirement of multiple cooperative routing algorithms.
+Because of this the decisions about the state of the radio are usually directly managed by the MAC protocols for the WSN.
 
 ## Multi-hop communication and mobility
 Assuming a wireless channel model without interference we can define $P_A$ as the power used by node A to send a message and $P^r_B$ as the intensity of the received signal at node B, given by the ratio of the sending power and the path loss, proportional to the distance of the nodes.
