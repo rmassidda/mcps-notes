@@ -56,19 +56,35 @@ Anyway it should be noticed that while turning off the processor is a local deci
 Because of this the decisions about the state of the radio are usually directly managed by the MAC protocols for the WSN.
 
 ## Multi-hop communication and mobility
-Assuming a wireless channel model without interference we can define $P_A$ as the power used by node A to send a message and $P^r_B$ as the intensity of the received signal at node B, given by the ratio of the sending power and the path loss, proportional to the distance of the nodes.
-We also define a threshold $\beta$ such that for node B to correctly receive a message it must hold $P^r_B > \beta$.
-When speaking of multi-hop communication the overall path loss can be computed by summing the distances or using simple trigonometric functions, for instance two short links are always better than a wider one, given that `GIGACONDITION FROM SLIDE 16`.
-
-Anyway the model without interference is unrealistic, so we redefine the correct transmission of a message from A to B iff.
+Assuming a wireless channel model without interference we can define $P_A$ as the power used by node A to send a message and $P^r_B$ as the intensity of the received signal at node B and $\beta$ as the minimal intensity to correctly receive the message.
 
 $$
-\forall C . d(C,B) \geq (1+\Delta)d(A,B)
+P_B^r = \frac{P_A}{PL(A,B)}
+$$
+$$
+P^r_B > \beta
 $$
 
-Where $\Delta$ is a constant that depends on the features of the radio and all the nodes C are the nodes that transmits simultaneously.
-For this reason is always better to use multiple short links than a wider one, since in this way we can allow other communications of other sensors.
-This can be proved by using Holder inequality.
+The path loss $PL$ is assumed to be proportional to $d(A,B)^\alpha$, where $d$ is the euclidean distance between the nodes and $\alpha$ is a constant depending on the environment, normally assumed in the range $[2,6]$.
+
+Assuming $\alpha = 2$ and using the law of cosines it's possible to state that $D(A,B)^2 > D(A,C)^2 + D(C,D)^2$ when $\gamma \geq \frac{\pi}{2}$, or equivalently when the node `C` is in the circle of the figure \ref{fig:path_loss}.
+Because of this two short links should be preferred when sending a message from `A` to `B`.
+
+![\label{fig:path_loss}](assets/path_loss.png)
+
+![\label{fig:interference}](assets/interference.png)
+
+Another possible problem in multi-hop communication is given by the interferences.
+Assume that the node `A` sent a packet to node `B`, the packet is correctly received if and only if for any other node `C` that transmits simultaneously:
+
+$$
+d(C,B) \geq (1+\Delta)d(A,B)
+$$
+
+Where $\Delta$ is a constant that depends on the features of the radio.
+
+For this reason in scenario like the one in figure \ref{fig:interference} is always better to use multiple short links than a wider one, since in this way we can allow other communications of other sensors.
+This can be proved by using Hölder inequality.
 
 ## MAC Protocols
 In a WSN the use of MAC protocols is not confined to media arbitration, but it is also useful for energy efficiency.
