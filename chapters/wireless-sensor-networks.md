@@ -193,50 +193,92 @@ In a grid-connected network the nodes closer to the sink are those that consume 
 Also in an arbitrary connected network bottlenecks are common, especially between nodes that are close to sink.
 
 ### Greedy Perimeter Stateless Routing (GPSR)
-This protocol tries to overcome the limitations of directed diffusion and of other similar protocols, providing arbitrary node-to-node routing and assuming limited resources and communication overhead.
-The protocol is scalable since there is no use for route discovery and few control packets are used.
+This protocol tries to overcome the limitations of directed diffusion and of other similar protocols, by providing arbitrary node-to-node routing and assuming limited resources and small communication overhead.
+The protocol is highly scalable since there is no use for route discovery and few control packets are used, without the need of large route caches.
 
-The nodes in the network must be aware of their position and of the position of their neighbors in a two dimensional space.
-When sending a message the source knows the coordinate of the destination, so packet headers contain the destination coordinate.
+The nodes in the network must be aware of their position and of the position of their neighbors in a two dimensional space, so that when sending a message the source knows only the geographical coordinates of the destination.
 
-GPSR actually comprises two different modes: Greedy forwarding and Perimeter forwarding.
+There are two different modes in which a package can traverse the network: greedy forwarding and perimeter forwarding.
 
-In greedy forwarding, considering a packet with destination D, the forwarding node x select as next hop a neighbor y such that y is closer to D than x and among the neighbors y is the closest to the destination.
-Greedy forwarding fails if the packets encounters a void, that is the actual node is closest to the destination but it can't reach it.
+#### Greedy forwarding
+In greedy forwarding, considering a packet from a node $x$ to a destination $D$, the next hop is chosen as the node most closer to $D$.
 
-Perimeter mode forwarding is used when greedy forwarding fails, routing around the void using a rule (usually Right-Hand-Rule RHR) to define rotation order, exploring the edges of the polygon enclosing the void.
+$$
+y = \arg\min_y d(y,D) < d(x,D)
+$$
+
+Greedy forwarding fails if the packets encounters a void, that means that the actual node $x$ is closer to the destination than all of its neighbors, but it can't reach $D$ anyway.
+
+#### Perimeter forwarding
+Perimeter forwarding is used when greedy forwarding fails, routing around the void using a rule (usually Right-Hand-Rule RHR) to define rotation order, exploring the edges of the polygon enclosing the void.
+In practice suppose that the packet lands on node $y$ from node $x$, using RHR the next edge to follow is the first counterclockwise edge from $(x,y)$.
+
+GPSR switches back to greedy forwarding whenever it finds a node that is closer than $x$ to the destination, where $x$ is the last node visited before switching to perimeter forwarding.
 
 The graph of the WSN is a non-planar embedding of a graph, so edges may cross and the RHR may take a degenerate tour that does not trace the boundary of a closed polygon.
-For this reason, GPSR applies the perimeter mode to a planar graph P obtained from the Relative Neighborhood Graph and the Gabriel Graph of the original non-planar graph G.
-If G is connected then P is connected, also P is obtained from G by removing edges and is computed with a distributed algorithm executed along with the perimeter mode packet forwarding.
+For this reason, GPSR applies the perimeter mode to a planar graph $P$ obtained from the Relative Neighborhood Graph and the Gabriel Graph of the original non-planar graph $G$.
+If $G$ is connected then $P$ is connected, also $P$ is obtained from $G$ by removing edges and it is computed with a distributed algorithm executed along with the perimeter mode packet forwarding.
 
-The greedy mode forwarding uses all the links in G, while the perimeter mode forwarding uses only the links in the planar graph P.
+![To select $(u,v)$ in RNG, $w$ must be out of the red area. To select it in the GG, $w$ must be out of the blue area. \label{gpsr_planar}](assets/gpsr_planar.png)
 
-The relative neighborhood graph RNG of G is the set of all the edges s.t.
+#### Relative neighborhood graph
+The relative neighborhood graph of $G$ is the set of all and only the edges that describe the minimal path for each pair of nodes.
 
 $$
-(u,v) \in P iff. (u,v) \in G \land
-d(u,v) \leq \max_{\forall w \in N(u) \cup N(v)} (d(u,w),d(w,v))
+(u,v) \in P \iff (u,v) \in G \land
+d(u,v) \leq \max_{\forall w \in N(u) \cup N(v)} d(u,w)+d(w,v)
 $$
 
-The Gabriel Graph is similar but it regards only a circular area.
+#### Gabriel graph
+The Gabriel graph of $G$ is the set of all and only the edges that describe the minimal quadratic path for each pair of nodes.
 
-The GG keeps more links than RNG, and actually RNG is a subgraph of GG, anyway both are suitable to GPSR.
+$$
+(u,v) \in P \iff (u,v) \in G \land
+d(u,v)^2 \leq \max_{\forall w \in N(u) \cup N(v)} d(u,w)^2 + d(w,v)^2
+$$
 
-Should be improved the part about perimeter mode.
+The Gabriel graph keeps more links than relative neighborhood graph, and actually RNG is a subgraph of GG, anyway both are suitable to use for perimeter mode in GPRS.
+A visualization of the conditions for RNG and GG is in figure \ref{gpsr_planar}, the node $w$ to be searched is called "witness".
 
-GPSR switches back to greed whenever it finds a node that is closer than the first one failing to the destination.
+A planar graph has two types of faces: the interior faces from the closed polygonal regions bounded by the graph edges, and the exterior face from the outer boundary of the graph.
 
-GPSR relies on updated information about the position of the neighbors because it needs a freshly planar version of the graph to avoid performance degradation.
-Performing planarization at each topology change is not good since node may move within a node's transmission range, continuously changing the selection of links by GG or RNG.
-A proactive approach is used: nodes periodically communicate their position to their neighbors.
-This beacon is used to keep updated the list of neighbors and to force planarization when the line changes are excessive.
+When in perimeter mode GPSR uses the right hand rule to reach an edge which crosses the line passing in $x$ and $D$ and is closer to $D$ than $x$.
+Using that edge, the packet moves to the adjacent face crossed by the line, at this time the current edge $e_0$ and the point of intersection between the line and the edge $L_f$ are stored.
 
-Planarization could fail due to unidirectional links caused for example by obstacles or because the assumption of unit disk graph does not hold anymore.
-This could lead to possible loops.
+If $D$ is reachable from $x$ then GPSR guarantees to find a route, otherwise the packet will reach the internal face containing the coordinates of $D$ or the external face.
+Not finding the node $D$ the packet will tours around the face until it passes again through edge $e_0$, at that point the packet is discharged.
 
-One solution is to use bidirectional links to avoid loops, this is enforced by the mutual witness rule.
-Even this can fail due to undetectable cross links, but there is another solution called Cross Link Detection Protocol, study that.
+GPSR relies on updated information about the position of the neighbors, so it needs a freshly planar version of the graph to avoid performance degradation.
+Performing planarization at each topology change is not a good idea, since nodes may move within a node's transmission range, continuously changing the selection of links by GG or RNG.
+A proactive approach is instead used: nodes periodically communicate their position to their neighbors.
+These beacon packets are used to keep updated the list of neighbors and to force planarization when the changes are excessive.
+
+Planarization could fail due to unidirectional links caused for example by obstacles or by non circular transmission ranges.
+As already observed without planarization loops may arise.
+
+![Cross links using mutal witness. $(a,d)$ uses $b$ as witness and $(b,c)$ uses $d$. \label{fig:crosslinks}](assets/crosslinks.png)
+
+#### Mutual witness
+The mutual witness protocol is an extension of the planarization algorithms.
+When analyzing the edge $(u,v)$ the edge is removed only if the witness $w$ is visible to both of the nodes, so not only the distance is considered as in standard GG or RNG creation.
+Anyway the procedure is not perfect, since as seen in figure \ref{fig:crosslinks} non planar graphs can result from the use of the mutual witness rule.
+
+#### Cross Link Detection Protocol
+CLDP operates on the full graph, so without preliminary planarization.
+Each node probes each of its links to see if it is crossed (in a geographic sense) by one or more other links.
+A probe initially contains the locations of the endpoints of the link being probed, and traverses the graph using the right-hand rule.
+When a node receives a probe it controls the coordinates of all the nodes that the probe traversed, if it finds a link crossing the current link it records the information in the probe.
+When the probe return to the source it may decide to remove one of the crossing links.
+
+However a link removal may result in a network disconnection, for this reason the probe counts the number of times it crosses a link.
+If a link had been crossed only once then it can be removed, since it means that there exist a loop and thus it is possible to reach any node in the loop by an alternative path.
+
+Link removal may require additional communications between nodes.
+Assume that node $w$ is testing its outgoing node $L$ that crosses link $L'$, to reduce the overhead CLDP uses some rules:
+
+- If nor $L$ neither $L'$ can be removed then both links are kept
+- If both links can be removed then $w$ removes $L$, since it requires less communication
+- If $L'$ cannot be removed, $L$ is removed, and vice versa
 
 ## Data-Centric Storage
 In a wireless sensor network there is an important tradeoff between the transmission and the storage of the informations.
