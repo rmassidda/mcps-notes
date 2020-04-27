@@ -282,19 +282,39 @@ Assume that node $w$ is testing its outgoing node $L$ that crosses link $L'$, to
 
 ## Data-Centric Storage
 In a wireless sensor network there is an important tradeoff between the transmission and the storage of the informations.
-Once the user sends instructions to the nodes each node can either:
+There are three possible ways to store data from a WSN:
 
-1. Send information to an external storage through the sink
-2. Store information internally in a local storage
-3. Use a data-centric storage
+1. The sensed information is sent to the sink, that then stores it outside of the WSN.
+2. The information is locally kept in the sensor, it's up to the sink to flood a query in the whole WSN to retrieve it.
+3. Data centric storage, where different nodes in the WSN are responsible of storing different data types, then the sink can retrieve the whole data or a summary per type.
 
-Let's define the asymptotic costs in terms of the number of nodes $n$, the cost for flooding a WSN is $O(n)$, while the cost for unicast in reasonably $O(\sqrt n)$.
+To compare this three techniques assume now that there are $T=Q$ different types of events or queries in the network, $D_{tot}$ is the number of events detected in a fixed amount of time and $D_q$ is the same for a fixed type of data.
+Given $n$ nodes in the network the number of packets needed to transmit an information is $O(n)$ for flooding the WSN and $O(\sqrt n)$ for unicast.
+Actually there are two metrics to consider, the total usage is the total number of packets in the WSN and hotspot usage that is the maximum number packets sent or received by a given node, for instance the sink.
 
-If using an external storage for each single event the cost is $O(\sqrt n)$, because it accounts the transmission of each information to the sink.
-Dealing with local storage the sensor does not incur in any communication cost, but the user should look for the information in the WSN, each query costs $O(n)$ and each reply $O(\sqrt n)$. 
-Using data-centric storage the cost is $O(\sqrt n)$ to direct the information to a specific node and $O(\sqrt n)$ to send the response of the query to the sink.
+| Type | Total | Hotspot |
+|-|-|-|
+| External storage | $D_{tot} * \sqrt n$ | $D_{tot}$ |
+| Local storage | $Q \cdot n + Q \cdot D_q \cdot \sqrt n$ | $Q + Q \cdot D_q$ |
+| DCS list | $D_{tot} \cdot \sqrt n + Q \cdot \sqrt n + Q \cdot D_q \cdot \sqrt n$ | $Q + Q \cdot D_q$ |
+| DCS summary | $D_{tot} \cdot \sqrt n + 2 \cdot Q \cdot \sqrt n$ | $2 \cdot Q$ |
 
-### Geographic Hash Tables
+In data-centric storage the events are named keys and corresponding data are stored by names in the network, queries are directed to the node that stores events of that key.
+There are so two operations supported by DCS: `Put(k,v)` and `Get(k)`.
+Both of these operations depend on a geographic hash function $h(k)$ that is able to produce geographic coordinates $(x,y)$.
+
+#### Perimeter refresh protocol
+Mobility or failure of a sensor may result in unavailability of a stored value, to provide persistence and consistency a possible solution is the perimeter refresh protocol.
+Assume from now on that the node $u$ has been selected as the home node for the key $k$, since it's the nearest node to $(x,y)$.
+
+PRP ensures persistence by selecting a perimeter of $u$ computed by GPSR and replicating all the known values of the key $k$ in all the nodes of the perimeter.
+Consistency is ensured since $u$ constantly generates refresh packets to destination $(x,y)$, if this packets reach a new destination $v$ then $v$ is elected as home node for the key $k$ and replicates the data in itself and its perimeter.
+Also the replica nodes in the perimeter checks on the home node using refresh packets, all these behaviours are regulated by timers.
+
+#### Structured replication
+The DCS should easily scale to multiple keys without overloading the nodes, structured replication is a way to load balance between multiple nodes.
+To each key $k$ are associated a root and $4d-1$ mirrors, then the node stores data in its closest mirror of $h(k)$.
+The retrieval of a value involves querying the root and possibly all mirrors of its mirrors.
 
 ## Physical and virtual coordinates
 
