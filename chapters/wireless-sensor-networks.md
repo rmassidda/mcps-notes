@@ -317,6 +317,40 @@ To each key $k$ are associated a root and $4d-1$ mirrors, then the node stores d
 The retrieval of a value involves querying the root and possibly all mirrors of its mirrors.
 
 ## Physical and virtual coordinates
+Traditional routing protocols for ad-hoc networks are not practical because of large routing or path caches and the size of packet headers, the geographic routing appears so to be a good option.
+The coordinates can be obtained by equipping nodes with GPS, but this solution comes with an additional cost and it's not always feasible.
+When no GPS system is available there are different ways to approximate the physical coordinates of the nodes.
+
+#### Identify boundaries
+The first task is to identify the boundary nodes of the network:
+
+- Choose at random two bootstrap nodes
+- Let the bootstraps broadcast `HELLO` packets in the network
+- Each node is able to determine its hop distance from the two bootstrap nodes, the nodes with maximum hop distance are classified as boundary nodes.
+
+#### Position boundaries
+Now that the boundary nodes are known it's possible to approximate their coordinates:
+
+- Each boundary node broadcasts `HELLO` packets in the network
+- Each boundary node is able to determine its hop distance with all of the other boundary nodes, this is called perimeter vector.
+- Each boundary node broadcasts its perimeter vector to the entire network.
+
+Assume now that $h(i,j)$ is the hop-distance between the two boundary nodes $i,j$ and $d(i,j)$ their euclidean distance, their positions can be found as the position that minimize the following optimization problem.
+$$
+\sum_{i,j \in p} ( h(i,j) - d(i,j))^2
+$$
+
+#### Position other nodes
+All of the other nodes in the network can now approximate their position $(x_i,y_i)$ in the network by using their neighbors $N_i$ with the following iterative process:
+
+$$
+x_i = \sum_{k\in N_i} \frac{x_k}{|N_i|}, \quad y_i = \sum_{k\in N_i} \frac{y_k}{|N_i|}
+$$
+
+#### Routing with recursive virtual coordinate
+An alternative is to use full virtual coordinates without trying to approximate physical coordinates, one of this is the RRVC protocol.
+Given two anchors $A,B$ in a network any other node position is described as the hop-distance from the anchors, the anchors also partition the networks between the nodes nearer to $A$ and those nearer to $B$.
+This partition can be iterated to improve the coordinates precision.
 
 ## Clustering in WSN
 
