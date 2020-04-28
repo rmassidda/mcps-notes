@@ -9,40 +9,42 @@ In ad-hoc networks we can recognize different goals to achieve:
 - Low overhead and memory requirements
 - Security
 
-The proactive approach attempt to maintain consistent, up to date routing information from each node to every other node in the network.
-In the reactive one the route to a destination is discovered only when it's desired by the source node.
+The proactive approach attempts to maintain consistent and updated routing informations over the network.
+Instead in the reactive approach the route to a destination is discovered only when it's desired by the source node.
 
-In the following discussion we will represent each terminal/station as a node in a graph, a directed edge from a node to another represents the faculty of a source to directly send packets to a destination.
-Assuming the same radio range for all the nodes and a circular transmission area we can state the links are symmetric, and so we can use an undirected graph.
+In the following discussion we will represent each host as a node in a graph, a directed edge from a node to another represents the faculty to directly send a packet between these hosts.
 
-## Dynamic Source Routing (DSR)
-The DSR is a protocol proposed in 1994 to quickly react to changes in the network without a centralization point and with a low overhead.
-The protocol is based on the following assumptions:
+## Dynamic Source Routing
+Dynamic Source Routing, DSR, is a protocol proposed in 1994 and based on the following assumptions:
 
 - The nodes are cooperative, all of them want to participate fully in the network protocol and will forward packets for other nodes.
 - The network diameter is small, the number of hops needed to travel from any node at the extreme edge of the network is small (5-10) but greater than 1.
 - Corrupted packets can be recognized and discarded by their destination.
 - The nodes may move in the network at any time without notice, but their speed is moderate with respect to the packet transmission latency, meaning that in general the topology change should be infrequent and unlikely to occur during the route discovery.
 
-The route discovery (RD) is the mechanism by which a node wishing to send a packet obtains a route to the destination if not already present.
+The route discovery (RD) is the mechanism by which a node wishing to send a packet obtains a route to the destination.
 The other basic mechanism of DSR is the route maintenance (RM) by which the source route is able to detect that topology has changed and so that the route for the required destination is no longer available.
 
-S searches for a source route R to D in its route cache, if it finds it S places R in the header of the new packet and sends it, otherwise it start a route discovery protocol sending a route request (RREQ) to all the nodes it can reach directly via local broadcast.
+Suppose now that a node `S` wants to send a packet to a node `D`.
+The source node searches for a route to `D` in its cache, if it finds it places the route in the header of the new packet and sends it, otherwise it start a route discovery protocol sending a route request (RREQ) via local broadcast.
 Each copy of the RREQ contains the unique IDs of the source and the destination, and the list of nodes through which the particular RREQ has been forwarded.
 
-When a node receives the RREQ and it's not the target checks if it has already received, in that case it discards it, otherwise it appends its unique ID and local broadcast it.
-When the target receives the RREQ returns a reply to S (RREP) including a copy of the accumulated route record, if the destination has not a path to the original source it has to start a route discovery combined with the RREP, this is obviously not needed if all the links are bidirectional.
-The target can receive possibly different paths, it can independently chose one of them based on latency, number of hops, energy levels or other metrics.
+When a node different from `D` receives the RREQ it checks if it already received the same request or if it is already in the accumulated path, in that case it discards it, otherwise it appends its unique ID and local broadcast the updated RREQ.
+When `D` receives the RREQ returns a reply to S (RREP) including a copy of the accumulated route record, if the destination has not a path to the original source it has to start a route discovery possibly combined with the RREP, this is obviously not needed if all the links are bidirectional.
+The target can receive the same RREQ from different paths, it can then independently chose one of them based on latency, number of hops, energy levels or other metrics.
 
 While the packets to be sent wait for a route discovery to be completed they are kept in a send buffer, they can expire and be deleted after a timeout, also they can be evicted with some policy (FIFO) to prevent send buffer from overflowing.
-Also the source node occasionally starts a route discovery, using exponential backoff to delay further route discoveries for the same destination to avoid overflowing the network in case the target is unreachable.
+Also the source node occasionally starts a route discovery for the nodes in the buffer.
+This is done by using exponential backoff to delay route discoveries for the same destination and avoid overflowing the network in case the target is unreachable.
 
-When sending a packet along a route each node in the route is responsible of the receipt of the packet at the following hop in the route.
-If a device detects that a route link is down a route error is returned to the sender stating the status of the link, the sender then removes all the routes containing the broken link from the cache, also the route error is reported to the upper layers.
+When sending a packet along a route each node is responsible of the receipt of the packet at the following hop.
+If a device detects that a route link is down a route error is sent back to `S`, that then removes all the routes containing the broken link from the cache.
+The route error is also reported to the upper layers. 
 
-A possible improvement is for all the nodes in the network to cache not only the results of a route discovery procedure, but also the accumulated routes in a route request/reply and the sources in a data packet.
-Also it's possible to reply to route request using cached routes, sharing the internal knowledge of the node without local broadcasting the request up to the target.
-In this case many nodes may have a route, so to avoid collisions and to favour shortest routes a node must wait for a random period before replying to the route request, this period is computed as following:
+A possible improvement of the protocol consist in storing overheard routing information.
+This means that a node not only caches the results of a route discovery, but also the route accumulated in a route request/reply or in the header of a data packet.
+Also it's possible to reply to route requests using cached routes, sharing the internal knowledge of the node without local broadcasting the request up to the target.
+In this case many nodes may have a route, so to avoid collisions and to favour shortest routes an host must wait for a random period before replying to the route request, this period is computed as following:
 
 $$
 D = L(H-1+R)
@@ -50,7 +52,11 @@ $$
 
 Where $H$ is the hop-length of the route to be returned, $R$ is a random number between 0 and 1, and $L$ is a constant at least twice the maximum wireless link propagation delay.
 
-Further improvements could include limit the time-to-live of RREQ, automatically cut out intermediate hops that are no longer needed in a route and cache broken links to prevent their use in other routes.
+Further improvements are:
+
+- Limit the time-to-live of RREQ
+- Automatically cut out intermediate hops that are no longer needed
+- Cache broken links to prevent their use in other routes
 
 The DSR packets are standard IP packets that uses special flags in the option header.
 
