@@ -102,13 +102,13 @@ When a node wishes to join a group or to send data to a group it starts a route 
 Only the members of the multicast tree can respond to such request.
 
 ## Dynamic Manet On Demand Routing (DYMO)
-The DYMO protocol has been proposed in 2011 and tries to simplify AODV and merge the features of both DSR and AODV.
+The DYMO protocol tries to simplify AODV and merge the good features of both DSR and AODV.
+The assumptions of the protocol are the same of DSR and AODV: cooperative nodes, bidirectional symmetric links, recognition of corrupted packets and slow mobility nodes.
 
-The assumptions of the protocol are the same already seen: cooperative nodes, bidirectional symmetric links, recognition of corrupted packets and slow mobility nodes.
+In DYMO route discovery and route maintenance work in similar way as in AODV, using sequence numbers to prevent loops but RREQ and RREP messages are used for creating table entries for all intermediate nodes, not only for source and destination.
+Like DSR instead `HELLO` packets are not used, favoring timers.
 
-In DYMO route discovery and route maintenance work in similar way as in AODV, using sequence numbers to prevent loops.
-Like DSR instead `HELLO` packets are not used, favoring timers, and RREQ and RREP messages carry information on all intermediate nodes, and are used for creating table entries for all intermediate nodes, not only for source and destination as in AODV.
+The sequence numbers are incremented when a source node generates a new RREQ, when a destination node answers with a RREP or when an intermediate node adds its information in a routing packet.
 
-The sequence numbers are incremented when a source node, generates a new RREQ or when a destination node answers with a RREP, also when an intermediate node adds its information in a routing packet.
 Also when a node is rebooted it must not set its sequence number to 0, since this could produce loops due to old entries in other node's tables, so the sequence number should be kept in persistent memory if possible.
-
+If there is not persistent memory the node should abstain from the communication, waiting for all the possible timers regulating the deletion of the path that may contain it.
