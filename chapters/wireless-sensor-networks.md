@@ -353,4 +353,74 @@ Given two anchors $A,B$ in a network any other node position is described as the
 This partition can be iterated to improve the coordinates precision.
 
 ## Clustering in WSN
+Clustering imposes a hierarchy to a WSN whose organization is otherwise flat.
+In this hierarchy it's possible to identify cluster heads that are dynamically assigned by the clustering protocol.
+The cluster heads set up and maintain the logical backbone of the network and coordinate the nodes to improve scalability and efficiency.
 
+A hierarchy in the network simplifies several network protocols, in particular routing and route discovery.
+For instance routing a packet from a node $u \to v$ is simpler using cluster heads $CH(\cdot)$.
+First using intra-cluster communication the message is sent $u \to CH(u)$, then using inter-cluster from $CH(u)\to CH(v)$ and finally $CH(v) \to v$.
+
+The clusters are constructed over the graph of logical links, in general to improve the communication logical links should overlap physical links as much as possible.
+If a logical link does not have a physical link, it is implemented by a path of physical links as short as possible.
+
+The clusters should also have a similar size, ideally the same size although this is often not possible.
+The cluster heads have an overhead that depends on the size of the cluster, a similar size of clusters means a similar overhead across the network.
+
+Given the dynamic nature of WSN and ad-hoc networks, stability is a desired feature for a clustering protocol.
+Slight changes in the network topology should result in slight changes in the clustering or in no change at all.
+
+#### $k$-neighbor clustering
+
+![Example of $k$-neighbor clustering.\label{fig:knc}](assets/knc.png)
+
+Using $k$-neighbor clustering the hop-distance between a node and its cluster head is limited as in:
+
+$$
+\forall u \in N \ldotp h(u,CH(u)) < k
+$$
+
+For instance with $k=1$ all the logical links within the cluster are also physical links, this is the case of Bluetooth and Zigbee.
+Also for inter-cluster links a similar rule is applied to guarantee small paths of physical links.
+
+$$
+\forall u,v \in N \ldotp h(CH(u),CH(v)) < h, \quad h \geq k
+$$
+
+The nodes that provide connectivity between different clusters are called gateways.
+An example of $k$-neighbor clustering with $k=1,h=2$ can be seen in figure \ref{fig:knc}.
+
+#### Dominating set
+A dominating set $D \subseteq N$ is the set of nodes such that
+
+$$
+\forall u \in N \setminus D \ldotp \exists v \in D \ldotp (u,v) \in E
+$$
+
+A dominant set is a feasible set of CH for a $1$-neighbor clustering of the network.
+
+#### Connected dominating set
+A connected dominating set $C \subseteq N$ for $G$ is a set of nodes such that $C$ is a dominating set and the subgraph $G' \subseteq G$ induced by $C$ is connected.
+Selecting the set of cluster heads as the CDS of $G$ corresponds to cluster with $k=1,h=1$ and so to obtain a connected backbone.
+
+#### Minimum connected dominating set
+In general there exists several CDS for a graph, the MCDS problem consists in finding one of minimum cardinality, that is the smallest set of cluster heads for $k$-neighbor clustering with $k=1,h=1$.
+This problem in NP-hard.
+
+The cluster heads may keep their radios on to sustain the communication of the entire network, allowing other nodes to save energy.
+The small size of the CDS is particularly desirable in this case: only a few nodes consume more energy, most of the nodes save energy.
+
+#### Distributed and mobility adaptive clustering
+DMAC is a simple clustering algorithm where each node in the network has a weight, which represents its willingness to become a cluster head.
+Weights may depend on the combination of several parameters of a node, like its battery charge, its ID or its position.
+
+Each node can be in three possible states: cluster head (CH), ordinary node (ON) or undecided (UN).
+When DMAC starts each node broadcasts to its neighbors an `HELLO` message which contains the node ID, its weight and its status.
+If a node has the maximum weight among its neighbors then it becomes a cluster head, all of its neighbors become ordinary nodes.
+This procedure enforces $k=1$, hence the set of CH is a dominating set, and $2 \leq h \leq 3$.
+
+When a node joins an already clustered network it should set its status to UN and sends an hello message to its neighbors that will consequently update their status.
+Other than for topology changes the clusters should be updated for each weight change.
+
+Chain reactions could arise when a node elects itself cluster head, and it's more likely as more nodes join the network.
+This is in general undesirable since involved nodes have to reconfigure themselves and this induces additional overhead.
