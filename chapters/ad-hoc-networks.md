@@ -61,7 +61,7 @@ Further improvements are:
 The DSR packets are standard IP packets that uses special flags in the option header.
 
 ## Ad-Hoc On-Demand Distance Vector (AODV)
-AODV is a project proposed in 1994 with the same goals of DSR, but the also integrates unicast, multicast and broadcast messages.
+AODV is a protocol with the same goals of DSR, but that also integrates unicast, multicast and broadcast messages.
 The assumptions are similar to the ones for DSR, the nodes must be cooperative but also the links must be bidirectional, this could be enforced by pruning unidirectional links.
 
 The protocol uses one route table for unicast and one for multicast.
@@ -71,7 +71,7 @@ If the entry is not used within a lifetime timer it is removed.
 Each node also maintains a monotonic sequence number, this value is increased each time a node detects a change in its neighborhood.
 Each multicast group maintains a separate sequence number.
 
-When a source originates a packet for a destination non present in it's routing table it broadcasts a route discovery message RREQ and sets a timer to wait for a reply.
+When a node `S` originates a packet for a destination `D` non present in it's routing table it broadcasts a route discovery message RREQ and sets a timer to wait for a reply.
 Since flooding the network with RREQ could be expensive a growing TTL is used by the source to try different route requests up to a fixed constant maximum, when a route is established the distance to the destination is recorded to set the initial TTL in the next route discovery for the same destination.
 The RREQ contains:
 
@@ -80,10 +80,11 @@ The RREQ contains:
 - Broadcast ID, which is incremented
 - Hop count initially set to zero
 
-When an intermediate node, known also as rely, receives a RREQ checks if it has already received it by comparing both IP source and broadcast id with a cache of all received RREQ in the near past.
+When an intermediate node, known also as rely, receives a RREQ checks if it has already received it by comparing both IP source and broadcast ID with a cache of all received RREQ in the near past.
 If the request is new it is processed by inserting in its routing table the reverse route for the source node, to be able to forward to it a RREP if it is received.
+This reverse route entry has a lifetime, if not used it is deleted to prevent stale info in the cache.
 
-A rely node is able to directly respond to a RREQ if it contains a unexpired entry for the destination in its route table with a sequence number at least great as the one included in the RREQ, this is needed to avoid loops.
+A rely node is able to directly respond to a RREQ via unicast if it contains a unexpired entry for the destination in its route table with a sequence number at least great as the one included in the RREQ, this is needed to avoid loops.
 If a rely node is not able to respond to RREQ it increments the hop count field in the RREQ and broadcasts the packet to its neighbors.
 
 When the RREQ finally reaches the destination a RREP is generated, containing more or less the same information of the RREQ, but also the route lifetime and the sequence number of the destination which is incremented by one.
@@ -91,7 +92,6 @@ When the RREQ finally reaches the destination a RREP is generated, containing mo
 If a rely node receives a RREP sets up a forward path for the destination in its route table and forwards the RREP by updating the hop count with its distance from the destination.
 
 Each node periodically sends to its neighbors special `HELLO` packets to inform its neighbors of its presence in the neighborhood, technically this packages are unsolicited RREP with TTL equal to 1 to prevent resend.
-
 For what concerns route maintenance each node back-propagates RERR packets to all its precursors, marking the unreachable destination with an infinite distance.
 
 ### Multicast
@@ -99,6 +99,7 @@ Each multicast group has a leader and a bidirectional multicast tree, a message 
 A multicast group has a sequence number maintained by the leader.
 
 When a node wishes to join a group or to send data to a group it starts a route request including the known sequence number for the group.
+Only the members of the multicast tree can respond to such request.
 
 ## Dynamic Manet On Demand Routing (DYMO)
 The DYMO protocol has been proposed in 2011 and tries to simplify AODV and merge the features of both DSR and AODV.
