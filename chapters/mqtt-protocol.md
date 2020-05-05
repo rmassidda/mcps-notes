@@ -1,7 +1,7 @@
 # MQTT
 The Massage Queuing Telemetry Transport (MQTT) is a communication protocol, lightweight and reliable. It's based on the publish/subscribe paradigm. It is lightweight because it needs a small code footprint, low network bandwidth, and lower packet overhead that guarantees better performance than HTTP. The main actors: the publisher, subscriber and the event service (knowns as broker). The first two, are clients and don't know each other meanwhile the broker knows both. The publisher and subscriber are fully decoupled in time, space and synchronization. Decoupling is guaranteed by the presence of the broker that acting as an intermediary, it receives all incoming messages from the publishers, filters them and distributes all messages to the subscribers and also manages the requests of subscription/unsubscription.
 
-[MQTT event handling example\label{MQTTpub_sub}](assets/MQTTpub_sub.png) 
+![MQTT event handling example\label{MQTTpub_sub}](assets/MQTTpub_sub.png) 
 
 Compared to the client-server architecture it allows greater scalability, by parallelizing the broker it is possible to connect millions of devices. 
 
@@ -9,7 +9,7 @@ The publisher and the subscriber need to know broker hostname/IP and port to pub
 Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  Also, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.  
 Communication between the actors provides different kinds of messages:
 
-[MQTT client/broker comunication\label{MQTT_protocol_example}](assets/MQTT_protocol_example.png)
+![MQTT client/broker comunication\label{MQTT_protocol_example}](assets/MQTT_protocol_example.png)
 
 The CONNECT message, sent by clients to the broker, contains: 
 - ClientID: a string that uniquely identifies the client at the broker. It can be empty: the broker assigns a clientID and it does not keep a status for the client (the parameter Clean Session must be TRUE)
