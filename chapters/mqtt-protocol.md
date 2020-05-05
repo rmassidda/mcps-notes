@@ -1,17 +1,16 @@
 # MQTT
-The Massage Queuing Telemetry Transport (MQTT) is a communication protocol, lightweight and reliable. It's based on the publish/subscribe paradigm. It is lightweight because it needs a small code footprint, low network bandwidth, and lower packet overhead that guarantees better performance than HTTP. The main actors: the publisher, subscriber and the event service (knowns as broker). The first two, are clients and don't know each other meanwhile the broker knows both. The publisher and subscriber are fully decoupled in time, space and synchronization. Decoupling is guaranteed by the presence of the broker that acting as an intermediary, it receives all incoming messages from the publishers, filters them and distributes all messages to the subscribers and also manages the requests of subscription/unsubscription.
-<p align="center">
-  <img src="/assets/MQTTpub_sub.png" height="400">
-</p>
+The Message Queuing Telemetry Transport (MQTT) is a communication protocol, lightweight and reliable. It's based on the publish/subscribe paradigm. It is lightweight because it needs a small code footprint, low network bandwidth, and lower packet overhead that guarantees better performance than HTTP. The main actors: the publisher, subscriber and the event service (knowns as broker). The first two, are clients and don't know each other meanwhile the broker knows both. The publisher and subscriber are fully decoupled in time, space and synchronization. Decoupling is guaranteed by the presence of the broker that acting as an intermediary, it receives all incoming messages from the publishers, filters them and distributes all messages to the subscribers and also manages the requests of subscription/unsubscription.
+
+![](assets/MQTTpub_sub.png){height=400px}
+
 Compared to the client-server architecture it allows greater scalability, by parallelizing the broker it is possible to connect millions of devices. 
 
 The publisher and the subscriber need to know broker hostname/IP and port to publish/subscribe messages. 
-Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  Also, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.  
+Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  Also, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.
 Communication between the actors provides different kinds of messages:
 
-<p align="center">
-  <img src="/assets/MQTT_protocol_example.png" height="400">
-</p>
+![](assets/MQTT_protocol_example.png){height=400px}
+
 The CONNECT message, sent by clients to the broker, contains: 
 - ClientID: a string that uniquely identifies the client at the broker. It can be empty: the broker assigns a clientID and it does not keep a status for the client (the parameter Clean Session must be TRUE)
 - Clean Session (optional):  a boolean value that determines if the client requests a persistent session: if it's FALSE the broker will store all subscriptions and missed messages, otherwise the broker cleans all information of the client of the previous session.
@@ -47,7 +46,7 @@ SUBACK message:
 Topics are strings that are organized in a hierarchy (topic levels) each level is separated by a «/», for example: home/firstfloor/bedroom/presence. Using wildcard extends the flexibility of this system:
 - '+' is used to subscribe to an entire set of elements for a specific level of the hierarchy 
 - '#' is used to subscribe to all publisher under a level of the hierarchy
-Topics that begin with a «$» are reserved for internal statistics of MQTT and they cannot be published by clients.
+Topics that begin with a «\$» are reserved for internal statistics of MQTT and they cannot be published by clients.
 
 ### QoS
 As said above in the MQTT protocol is provides a QoS system which is an agreement between publisher, broker and subscriber. There are three levels of QoS:
