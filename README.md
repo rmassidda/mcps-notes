@@ -13,4 +13,4 @@ A not-surely-updated PDF copy is included in the repository as `mcps-notes.pdf`.
 - Embedding programming
 - Signal theory
 - Thingspeak
-- Various standards
+- [ZigBee](chapters/zigbee.md)

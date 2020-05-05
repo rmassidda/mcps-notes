@@ -1,4 +1,4 @@
-SOURCES = introduction.md wireless-networks.md cellular-networks.md ad-hoc-networks.md wireless-sensor-networks.md
+SOURCES = introduction.md wireless-networks.md cellular-networks.md ad-hoc-networks.md wireless-sensor-networks.md zigbee.md
 
 mcps-notes.pdf: $(addprefix chapters/, ${SOURCES})
 	pandoc $^ -o $@
