@@ -3,15 +3,13 @@ The Massage Queuing Telemetry Transport (MQTT) is a communication protocol, ligh
 
 <img src="/assets/MQTTpub_sub.png" height="400">
 
-![MQTT event handling example](/assets/MQTTpub_sub.png=100x80)
-
 Compared to the client-server architecture it allows greater scalability, by parallelizing the broker it is possible to connect millions of devices. 
 
 The publisher and the subscriber need to know broker hostname/IP and port to publish/subscribe messages. 
 Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  Also, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.  
 Communication between the actors provides different kinds of messages:
 
-![MQTT client/broker comunication](/assets/MQTT_protocol_example.png)
+<img src="/assets/MQTT_protocol_example.png" height="400">
 
 The CONNECT message, sent by clients to the broker, contains: 
 - ClientID: a string that uniquely identifies the client at the broker. It can be empty: the broker assigns a clientID and it does not keep a status for the client (the parameter Clean Session must be TRUE)
