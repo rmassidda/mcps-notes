@@ -24,8 +24,7 @@ The CONNECTACK message, response for the CONNECT message:
 
 After connection, a client can publish messages. Each message contains a topic and a payload that contains the data.
 
-The PUBLISH message:
-PUBLISH message: 
+The PUBLISH message: 
 - PacketId: an integer, it's 0 if the QoS level is 0.
 - TopicName: a string possibly structured in a hierarchy with «/» as delimiters, for example: «home/bedroom/temperature».
 - QoS: 0, 1 or 2.
