@@ -46,8 +46,9 @@ SUBACK message:
 Topics are strings that are organized in a hierarchy (topic levels) each level is separated by a «/», for example: home/firstfloor/bedroom/presence. Using wildcard extends the flexibility of this system:
 - '+' is used to subscribe to an entire set of elements for a specific level of the hierarchy 
 - '#' is used to subscribe to all publisher under a level of the hierarchy
-
 Topics that begin with a «$» are reserved for internal statistics of MQTT and they cannot be published by clients.
+
+### QoS
 As said above in the MQTT protocol is provides a QoS system which is an agreement between publisher, broker and subscriber. There are three levels of QoS:
 
 - QoS 0 (At most one): at this level the delivery uses the "best-effort" method, there aren't ACK messages and the broker doesn't store messages for offline clients. 
