@@ -1,7 +1,7 @@
 # MQTT
 The Massage Queuing Telemetry Transport (MQTT) is a communication protocol, lightweight and reliable. It's based on the publish/subscribe paradigm. It is lightweight because it needs a small code footprint, low network bandwidth, and lower packet overhead that guarantees better performance than HTTP. The main actors: the publisher, subscriber and the event service (knowns as broker). The first two, are clients and don't know each other meanwhile the broker knows both. The publisher and subscriber are fully decoupled in time, space and synchronization. Decoupling is guaranteed by the presence of the broker that acting as an intermediary, it receives all incoming messages from the publishers, filters them and distributes all messages to the subscribers and also manages the requests of subscription/unsubscription.
 
-<img src="/assets/MQTTpub_sub.png" height="200">
+<img src="/assets/MQTTpub_sub.png" height="400">
 
 ![MQTT event handling example](/assets/MQTTpub_sub.png=100x80)
 
