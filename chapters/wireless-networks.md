@@ -36,13 +36,13 @@ After the $i$ collision each station waits a number of contention slots comprise
 In CSMA/CD the interferences are detected by the transmitter, while in the wireless networks what matters are interferences at the receiver.
 Using CSMA/CD in wireless networks leads to two known problematic scenarios: the hidden terminal and the exposed terminal.
 
-![Hidden terminal](assets/hidden_terminal.png)
+![Hidden terminal](../assets/hidden_terminal.png)
 
 In the hidden terminal problem there are three stations, `A`, `B` and `C`.
 Suppose that `A` and `C` want simultaneously to send a packet to `B`, and that `A` is not in the range of `C` and vice versa.
 Both the senders would sense the medium as free, while `B` will only receive noise due to the collision in its range.
 
-![Exposed terminal](assets/exposed_terminal.png)
+![Exposed terminal](../assets/exposed_terminal.png)
 
 Suppose now that `A` and `C` are both in the range of `B` and that `B` is sending a packet to `A`.
 In the exposed terminal scenario using CSMA/CD `C` must refrain to send any packet, while there could be a station `D` out of the range of `B` to which `C` could communicate without any problem.

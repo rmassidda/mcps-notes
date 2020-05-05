@@ -70,9 +70,9 @@ The path loss $PL$ is assumed to be proportional to $d(A,B)^\alpha$, where $d$ i
 Assuming $\alpha = 2$ and using the law of cosines it's possible to state that $D(A,B)^2 > D(A,C)^2 + D(C,D)^2$ when $\gamma \geq \frac{\pi}{2}$, or equivalently when the node `C` is in the circle of the figure \ref{fig:path_loss}.
 Because of this two short links should be preferred when sending a message from `A` to `B`.
 
-![\label{fig:path_loss}](assets/path_loss.png)
+![\label{fig:path_loss}](../assets/path_loss.png)
 
-![\label{fig:interference}](assets/interference.png)
+![\label{fig:interference}](../assets/interference.png)
 
 Another possible problem in multi-hop communication is given by the interferences.
 Assume that the node `A` sent a packet to node `B`, the packet is correctly received if and only if for any other node `C` that transmits simultaneously:
@@ -182,7 +182,7 @@ Since each sensor is associated with a unique ID, it's possible for the sink to 
 To improve the quality of received data the reinforcement of an interest are required with higher sampling rate, this also is useful to contrast the implosion problem.
 Reinforcement is usually done after a first broadcast dissemination, so once the sink already started receiving data matching the exploratory interest.
 
-![State machine of a sensor in directed diffusion\label{fig:dd_machine}](assets/dd_machine.png)
+![State machine of a sensor in directed diffusion\label{fig:dd_machine}](../assets/dd_machine.png)
 
 The protocol can be easily represented using a two-state machine as in figure \ref{fig:dd_machine}, and it's suitable for implementation on low-end devices.
 It's a scalable and robust protocol that results to be effective in applications that do not require complex data aggregation/preprocessing.
@@ -219,7 +219,7 @@ The graph of the WSN is a non-planar embedding of a graph, so edges may cross an
 For this reason, GPSR applies the perimeter mode to a planar graph $P$ obtained from the Relative Neighborhood Graph and the Gabriel Graph of the original non-planar graph $G$.
 If $G$ is connected then $P$ is connected, also $P$ is obtained from $G$ by removing edges and it is computed with a distributed algorithm executed along with the perimeter mode packet forwarding.
 
-![To select $(u,v)$ in RNG, $w$ must be out of the red area. To select it in the GG, $w$ must be out of the blue area. \label{gpsr_planar}](assets/gpsr_planar.png)
+![To select $(u,v)$ in RNG, $w$ must be out of the red area. To select it in the GG, $w$ must be out of the blue area. \label{gpsr_planar}](../assets/gpsr_planar.png)
 
 #### Relative neighborhood graph
 The relative neighborhood graph of $G$ is the set of all and only the edges that describe the minimal path for each pair of nodes.
@@ -256,7 +256,7 @@ These beacon packets are used to keep updated the list of neighbors and to force
 Planarization could fail due to unidirectional links caused for example by obstacles or by non circular transmission ranges.
 As already observed without planarization loops may arise.
 
-![Cross links using mutal witness. $(a,d)$ uses $b$ as witness and $(b,c)$ uses $d$. \label{fig:crosslinks}](assets/crosslinks.png)
+![Cross links using mutal witness. $(a,d)$ uses $b$ as witness and $(b,c)$ uses $d$. \label{fig:crosslinks}](../assets/crosslinks.png)
 
 #### Mutual witness
 The mutual witness protocol is an extension of the planarization algorithms.
@@ -372,7 +372,7 @@ Slight changes in the network topology should result in slight changes in the cl
 
 #### $k$-neighbor clustering
 
-![Example of $k$-neighbor clustering.\label{fig:knc}](assets/knc.png)
+![Example of $k$-neighbor clustering.\label{fig:knc}](../assets/knc.png)
 
 Using $k$-neighbor clustering the hop-distance between a node and its cluster head is limited as in:
 

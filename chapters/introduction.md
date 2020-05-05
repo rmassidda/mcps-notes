@@ -13,7 +13,7 @@ toc: True
 <!-- As seen in figure \ref{5gfeatures} the 5G technology provides an improvement of different orders of magnitude in respect to the existing standards. -->
 <!-- Still it is reductive to refer to 5G just as an improvement in respect to previous technologies: the softwarization of the network functions and the enlargement of the frequency bands are a radical change in communication science. -->
 
-<!-- ![5G feature comparison\label{5gfeatures}](assets/5gfeatures.png) -->
+<!-- ![5G feature comparison\label{5gfeatures}](../assets/5gfeatures.png) -->
 
 <!-- ## MANETS -->
 <!-- With the acronym MANETS, for Mobile ad-hoc networks, we refer to a decentralized type of wireless network. -->
