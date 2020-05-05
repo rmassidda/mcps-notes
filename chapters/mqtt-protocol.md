@@ -6,17 +6,17 @@ The Massage Queuing Telemetry Transport (MQTT) is a communication protocol, ligh
 Compared to the client-server architecture it allows greater scalability, by parallelizing the broker it is possible to connect millions of devices. 
 
 The publisher and the subscriber need to know broker hostname/IP and port to publish/subscribe messages. 
-Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  In addition, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.  
-Communication between the actors provides a different kind of messages:
+Messages can be filtered on a certain subject or topic, the content of the message (for example a specific query) or the type of data. Publishers and subscribers need to agree on the topics beforehand.  Also, MQTT provides QoS to ensure reliability in the delivery of messages, there are three levels of QoS.  
+Communication between the actors provides different kinds of messages:
 
 [MQTT client/broker comunication\label{MQTT_protocol_example}](assets/MQTT_protocol_example.png)
 
-The CONNECT message, exchanged sent by clients to the broker, contains: 
-- ClientID: a string that uniquely identifies the client at the broker, can be empty: the broker assigns a clientID and it does not keep a status for the client (the parameter Clean Session must be TRUE)
+The CONNECT message, sent by clients to the broker, contains: 
+- ClientID: a string that uniquely identifies the client at the broker. It can be empty: the broker assigns a clientID and it does not keep a status for the client (the parameter Clean Session must be TRUE)
 - Clean Session (optional):  a boolean value that determines if the client requests a persistent session: if it's FALSE the broker will store all subscriptions and missed messages, otherwise the broker cleans all information of the client of the previous session.
 - Username/Password (Optional)
-- Will flags (optional): If and when the client disconnects gracefully, the broker will notify the other clients of the disconnection.
-- KeepAlive (optional): The client commits itself to send a control packet (or alternatively a ping message) to the broker within a keep-alive interval.
+- Will flags (optional): If and when the client disconnects unexpectedly, the broker will notify the other clients of the disconnection.
+- KeepAlive (optional): The client commits itself to send a control packet (or a ping message) to the broker within a keep-alive interval.
 
 The CONNECTACK message, response for the CONNECT message:
 - Connect Acknowledgement flags: confirms whether the connection was successful or not.
@@ -38,13 +38,13 @@ SUBSCRIBE message:
 - Topic1: a string (see publish messages)
 - QoS1: 0, 1 or 2
 
-The last 2 fields are repeated in a list for all the topics to subscribe to.
+The last 2 fields are repeated in a list for all the topics the sender wants to subscribe to.
 
 SUBACK message:
 - PacketId: the same integer of SUBSCRIBE message
 - returnCode: one for each topic subscribed
 
-Topics are strings that are organized in a hierarchy (topic levels) each level is separated by a «/», for example: home/first floor/bedroom/presence. Using wildcard extends the flexibility of this system:
+Topics are strings that are organized in a hierarchy (topic levels) each level is separated by a «/», for example: home/firstfloor/bedroom/presence. Using wildcard extends the flexibility of this system:
 - '+' is used to subscribe to an entire set of elements for a specific level of the hierarchy 
 - '#' is used to subscribe to all publisher under a level of the hierarchy
 
@@ -64,10 +64,10 @@ As we already mentioned, the QoS definition and levels between the client that s
 The packet identifier that MQTT uses for QoS 1 and QoS 2 is unique between a specific client and a broker within an interaction. This identifier is not unique between all clients. Once the flow is complete, the packet identifier is available for reuse. This reuse is the reason why the packet identifier does not need to exceed  65535. It is unrealistic that a client can send more than this number of messages without completing an interaction.
 
 ### Persistent session
-The broker keeps persistent information about the state of the communication with clients. This information includes: the topics of the client, all messages, not confirmed and that are arrived when the client was offline, if QoS is 1 or 2. To achieve a persistent session at connection time the flag "cleanSession" must be set on FALSE. A particular type of persistent message is the retained messages which are normal messages with flag "retainedFlag" set on TRUE, their peculiarity consists that only the last sent message published on a certain topic will be stored. Retained messages make sense for unfrequent updates of a topic, for instance, the device status update (ON/OFF). 
+If QoS is 1 or 2 the broker keeps persistent information about the state of the communication with clients. This information includes: the topics of the client, all messages that were not confirmed and those that were arrived when the client was offline. To achieve a persistent session at connection time the flag "cleanSession" must be set on FALSE. A particular type of persistent message is the retained messages which are normal messages with flag "retainedFlag" set on TRUE, their peculiarity consists that only the last sent message published on a certain topic will be stored. Retained messages make sense for unfrequent updates of a topic, for instance, the device status update (ON/OFF). 
 
 ### Last will & testament
-Last Will & Testament is a type of message sent by the broker to notify other clients about the ungraceful disconnection of a client, for instance I/O error, KeepAlive message missing or a simple network disconnection. Like all the other messages last will is a normal message with topic, retained flag, QoS. To achieve it is necessary to specify it at CONNECT time requiring a specific behavior about its last will.
+Last Will & Testament is a type of message sent by the broker to notify other clients about the ungraceful disconnection of a client, for instance I/O error, KeepAlive message missing or a simple network disconnection. Like all the other messages last will is a normal message with topic, retained flag, QoS and a payload. To activate it is necessary to specify it at CONNECT time requiring a specific behavior about its last will.
 
 ## Alternatives to MQTT
-The need for a centralized broker can be limiting in distributed IoT applications with diffused point-to-point communications. The overhead of a broker may easily become not compatible with end-devices capabilities as the network scales up. The broker is a single point of failure and it is essential to keep the network alive. MQTT relies on TCP, which is not particularly cheap for lowend devices that, require much more resources than UDP for example, it uses connections that need to be established and maintained and it impacts on the batteries (and thus on the lifetime of the devices). An alternative to MQTT is Constrained Application Protocol (CoAP), which is a specialized web transfer protocol, useful in a constrained network for IoT, designed for machine-to-machine (M2M) applications such as smart energy and building automation. It's based on the Server/Client paradigm and uses the REST model, works similarly to HTTP but is based on UDP and provides a more light header suitable for devices that has small amounts of ROM and RAM. 
+In some cases the need for a centralized broker can be limiting in distributed IoT applications with diffused point-to-point communications, for instance, its overhead may easily become not compatible with end-devices capabilities as the network scales up or the fact that the broker is a single point of failure and it is essential to keep the network alive. Moreover, MQTT relies on TCP, which is not particularly cheap for lowend devices that, require much more resources than UDP for example, it uses connections that need to be established and maintained and it impacts on the batteries (and thus on the lifetime of the devices). An alternative to MQTT is Constrained Application Protocol (CoAP), which is a specialized web transfer protocol, useful in a constrained network for IoT, designed for machine-to-machine (M2M) applications such as smart energy and building automation. It's based on the Client/Server paradigm, uses the REST model, works similarly to HTTP but is based on UDP and provides a more light header suitable for devices that has small amounts of ROM and RAM. 
