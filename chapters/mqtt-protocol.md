@@ -29,8 +29,8 @@ The PUBLISH message:
 - TopicName: a string possibly structured in a hierarchy with «/» as delimiters, for example: «home/bedroom/temperature».
 - QoS: 0, 1 or 2.
 - RetainFlag: tells if the message is to be stored by the broker as the last known value for the topic. If a subscriber collects later, it will get this message.
-- payload: the actual message in any form.
-- dupFlag: indicates that the message is a duplicate of a previous, un-acked message. Meaningful only if the QoS level is > 0.
+- Payload: the actual message in any form.
+- DupFlag: indicates that the message is a duplicate of a previous, un-acked message. Meaningful only if the QoS level is > 0.
 
 SUBSCRIBE message:
 - PacketId: an integer
@@ -41,7 +41,7 @@ The last 2 fields are repeated in a list for all the topics the sender wants to 
 
 SUBACK message:
 - PacketId: the same integer of SUBSCRIBE message
-- returnCode: one for each topic subscribed
+- ReturnCode: one for each topic subscribed
 
 Topics are strings that are organized in a hierarchy (topic levels) each level is separated by a «/», for example: home/firstfloor/bedroom/presence. Using wildcard extends the flexibility of this system:
 - '+' is used to subscribe to an entire set of elements for a specific level of the hierarchy 
