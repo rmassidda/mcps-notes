@@ -1,7 +1,7 @@
 # Mobile and Cyber-Physical Systems
 Notes of the course of Mobile and Cyber-Physical Systems from [Prof. Stefano Chessa](http://pages.di.unipi.it/chessa/), Academic Year 2019/2020.
 
-A not-surely-updated PDF copy is included in the repository as `mcps-notes.pdf`.
+A not-surely-updated PDF copy is included in the repository as [mcps-notes](https://github.com/rmassidda/mcps-notes/raw/master/mcps-notes.pdf)
 
 ## Contents
 - [Introduction](chapters/introduction.md)
@@ -13,4 +13,4 @@ A not-surely-updated PDF copy is included in the repository as `mcps-notes.pdf`.
 - Embedding programming
 - Signal theory
 - Thingspeak
-- Various standards
+- [MQTT](chapters/mqtt-protocol.md)
