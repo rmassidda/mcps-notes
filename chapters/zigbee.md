@@ -115,3 +115,70 @@ The devices will need to either remain always active or
 synchronize with each other.
 In the first case the device can directly transmit the data
 In the latter case the devices synchronization is beyond the scope of the IEEE 802.15.4 standard, since it is left to the upper layers.
+
+### MAC layer management service
+The management services at the MAC layer offer functionalities for PAN initialization, PAN detection, device association and others.
+
+#### Association protocol
+The associate protocol is invoked by a device willing to associate with a PAN that has already been identified by a preliminary execution of the SCAN service in beacon-enabled networks.
+The `ASSOCIATE.request` primitive takes as parameter the PAN identifier, the coordinator address and the 64-bits extended IEEE address of the device.
+It sends an association request message to the coordinator, since the association procedure is meant for beacon-enabled networks, the association request message is sent during the CAP using the slotted CSMA-CA protocol.
+The coordinator acknowledges the reception of the association messages, however this acknowledgement does not mean that the request has been accepted.
+
+The association request message is passed to the network (NWK) layer using the primitive `ASSOCIATION.indication` to decide about the association.
+If the request is accepted, the NWK layer:
+
+- selects a short 16 bit address, it will be used by the end-device in place of the 64-bit extended IEEE address.
+- invokes the `ASSOCIATE.response` primitive. This primitive takes as parameters the 64 bit address of the device, the new 16 bit short address and the status of the request.
+
+The `ASSOCIATE.response` primitive sends an association response command to the device.
+Then the MAC layer of the end-device issues an `ASSOCIATE.confirm` primitive to the upper layer and the MAC layer of the coordinator issues the `COMM-STATUS.indication` primitive to its upper layer.
+
+The overall procedure can be seen in figure \ref{fig:zigbee_association}.
+
+![\label{fig:zigbee_association}](../assets/zigbee_association.png)
+
+### MAC layer security
+The IEEE 802.15.4 MAC layers provides a basic support for security.
+Advanced security features (such as keys management, device authentication) are left to the upper layers.
+The security features are optional and the applications can decide when and which functionality they use.
+Security services based on symmetric-keys, the keys are provided by the higher layers.
+
+For what concerns access control, each device maintains a Access Control List (ACL) of devices with whom it can communicate.
+The packets received from devices not included in the ACL are discarded.
+
+It's in use symmetric encryption of data, commands and beacon payloads
+The encryption/decryption key can be shared by a group of devices (group key) or it can be shared by only two peers (link key).
+
+The frame integrity protects data, command and beacon frames from being altered by parties without the cryptographic key and assures that the data comes from a device with the cryptographic key.
+Integrity may be provided on data, beacon and command frames.
+Uses the same key used for encryption (either a group or a link key).
+
+The sequential freshness property orders the sequence of input frames to ensure that an input frame is more recent than the last received frame.
+
+## Network layer
+The network layers comprises three types of devices:
+
+- The network coordinator, is an FFD that creates and manages the entire network.
+- The routers, that are FFDs with routing capabilities.
+- The end-devices, that can be either an RFD or an FFD without any responsibility.
+
+These devices can be topologically disposed as a star mapping the IEEE 802.15.4 topology and using the superframe, as a tree possibly using the superframe structure or as a mesh communicating without the superframe structure.
+Network addressing is needed to maintain the information of the source and the destination in a multi-hop communication scenario, where the MAC addresses refer to the source and destination per-hop.
+
+The network layer offers services for data transmission, network initialization, devices addressing, routes management & routing, management of joins/leaves of devices.
+
+Before communicating on a network, a ZigBee device must either form a new network as a coordinator or join an existing network as a router or end-device.
+For the network association or formation sequence flow refer to the slides.
+The role of the device is chosen at compile-time.
+
+The parent-child relationships established as a result of the join operations shapes the network in a tree where the coordinator is the root and the end-devices are the leaves, a router can be either an internal node or a leave.
+The coordinator is statically configured  with the maximum number of routers each router may have as a children $R$, the maximum number of end-devices each router may have as children $D$ and the maximum depth of the tree $L$.
+Each router is assigned with a range of addresses to assign to its children.
+
+In a tree-like topology the routing is trivial, but beacon scheduling is necessary to prevent the beacons of one router from colliding with either the beacons or data transmissions of its neighbouring devices.
+The idea is to have short active portions as compared to the beacon interval, this avoids overlapping beacons of neighbouring routers.
+The larger is the inactive period, the more devices that can transmit beacon frames in the same neighbourhood.
+
+In a mesh topology the routing protocol is based on AODV, if the sender is an end-device it forwards the message to its parents, if the sender is a router or the coordinator it maintains a routing table and it routes consequently the message.
+
