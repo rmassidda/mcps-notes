@@ -13,4 +13,5 @@ A not-surely-updated PDF copy is included in the repository as [mcps-notes](http
 - Embedding programming
 - Signal theory
 - Thingspeak
+- [ZigBee](chapters/zigbee.md)
 - [MQTT](chapters/mqtt-protocol.md)
